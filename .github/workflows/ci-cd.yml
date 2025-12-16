@@ -157,15 +157,15 @@ jobs:
     - name: Build and start all services
       working-directory: ./lab2
       run: |
-        docker-compose build
-        docker-compose up -d
+        docker compose build
+        docker compose up -d
 
     - name: Wait for services to be ready
       working-directory: ./lab2
       run: |
         echo "Waiting for services to start..."
         sleep 15
-        docker-compose ps
+        docker compose ps
 
     - name: Check backend health
       run: |
@@ -180,11 +180,11 @@ jobs:
       working-directory: ./lab2
       run: |
         echo "=== Backend logs ==="
-        docker-compose logs backend
+        docker compose logs backend
         echo "=== Frontend logs ==="
-        docker-compose logs frontend
+        docker compose logs frontend
         echo "=== Database logs ==="
-        docker-compose logs db
+        docker compose logs db
 
     - name: Check connection logs
       working-directory: ./lab2
@@ -199,7 +199,7 @@ jobs:
     - name: Tear down services
       if: always()
       working-directory: ./lab2
-      run: docker-compose down -v
+      run: docker compose down -v
 
   # Деплой (опционально, раскомментируйте если нужен)
   # deploy:
@@ -234,5 +234,5 @@ jobs:
   #       key: ${{ secrets.SSH_PRIVATE_KEY }}
   #       script: |
   #         cd /path/to/lab2
-  #         docker-compose pull
-  #         docker-compose up -d
+  #         docker compose pull
+  #         docker compose up -d
