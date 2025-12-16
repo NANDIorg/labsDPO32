@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import engine, Base
 from app.routers import products_router, categories_router
+from app.middleware import LoggingMiddleware
 
 Base.metadata.create_all(bind=engine)
 
@@ -19,6 +20,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Middleware для логирования подключений
+app.add_middleware(LoggingMiddleware)
 
 app.include_router(products_router)
 app.include_router(categories_router)

@@ -17,6 +17,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - Mamonov
 
   backend:
     build: ./backend
@@ -28,6 +30,10 @@ services:
         condition: service_healthy
     ports:
       - "8000:8000"
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - Mamonov
 
   frontend:
     build: ./frontend
@@ -36,6 +42,15 @@ services:
       - backend
     ports:
       - "3000:80"
+    networks:
+      - Mamonov
 
 volumes:
   postgres_data:
+
+networks:
+  Mamonov:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.20.1.0/24
