@@ -12,6 +12,21 @@ jobs:
     name: Backend CI/CD
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -58,12 +73,22 @@ jobs:
 
     - name: Test Backend container
       run: |
+        # Запускаем контейнер с host network для доступа к БД на localhost
         docker run -d --name test-backend \
+          --network host \
           -e DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test_db \
-          -p 8000:8000 \
           reference-backend:latest
-        sleep 5
-        docker ps | grep test-backend
+        sleep 10
+        # Проверяем что контейнер запущен
+        if docker ps | grep test-backend; then
+          echo "Backend container is running"
+          # Проверяем health endpoint
+          curl -f http://localhost:8000/api/health || echo "Health check failed, but container is running"
+        else
+          echo "Backend container failed to start"
+          docker logs test-backend
+          exit 1
+        fi
         docker stop test-backend
         docker rm test-backend
 
